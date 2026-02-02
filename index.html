@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FRNCZ Pixel</title>
+<style>
+    body {
+        margin: 0;
+        height: 100vh;
+        background-color: #131211;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-family: 'Courier New', monospace;
+    }
+
+    .pixel-text {
+        color: #ffffff;
+        font-size: 6vw; /* reszponzív méret */
+        letter-spacing: 0.5ch;
+        text-shadow:
+            1px 1px #0f0,
+            2px 2px #0f0,
+            3px 3px #0f0; /* zöld pixel hacker-es fény */
+    }
+
+    @media (max-width: 600px) {
+        .pixel-text {
+            font-size: 12vw;
+        }
+    }
+</style>
+</head>
+<body>
+    <div class="pixel-text">FRNCZ</div>
+</body>
+</html>
