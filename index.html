@@ -4,49 +4,99 @@
 <meta charset="UTF-8">
 <title>Kali Wi-Fi Command Generator</title>
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
 <style>
 :root{
   --bg:#0f1220;--card:#171a2b;--line:#24284a;
   --txt:#e6e8ff;--muted:#9aa0ff;--acc:#4f8cff;
-  --danger:#ff5c5c;
 }
 *{box-sizing:border-box}
 body{
-  margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto;
-  background:var(--bg);color:var(--txt);
+  margin:0;
+  font-family:system-ui,-apple-system,Segoe UI,Roboto;
+  background:var(--bg);
+  color:var(--txt);
 }
-.wrapper{max-width:420px;margin:auto;padding:12px}
+.wrapper{
+  max-width:420px;
+  margin:auto;
+  padding:12px;
+}
 h1{font-size:20px;margin:8px 0}
+.small{font-size:12px;color:var(--muted);margin-bottom:8px}
+
 .card{
-  background:var(--card);border:1px solid var(--line);
-  border-radius:12px;padding:12px;margin-bottom:12px;
+  background:var(--card);
+  border:1px solid var(--line);
+  border-radius:12px;
+  padding:12px;
+  margin-bottom:12px;
+  overflow:hidden; /* iOS overflow fix */
 }
 .card h2{font-size:15px;margin:0 0 8px}
-label{font-size:13px;color:var(--muted)}
+
+label{
+  font-size:13px;
+  color:var(--muted);
+}
+
 input,select,textarea{
-  width:100%;margin-top:4px;margin-bottom:8px;
-  background:#0b0d1a;color:var(--txt);
-  border:1px solid var(--line);border-radius:8px;
-  padding:10px;font-size:14px;
+  width:100%;
+  margin-top:4px;
+  margin-bottom:8px;
+  background:#0b0d1a;
+  color:var(--txt);
+  border:1px solid var(--line);
+  border-radius:8px;
+  padding:10px;
+  font-size:14px;
 }
-textarea{min-height:120px;font-family:ui-monospace,monospace}
-.inline{display:flex;gap:8px}
-.inline>*{flex:1}
-.toggle{display:flex;align-items:center;gap:8px;font-size:13px}
+
+textarea{
+  min-height:130px;
+  font-family:ui-monospace,monospace;
+  white-space:pre-wrap;
+}
+
+/* Toggle rows */
+.toggle{
+  display:flex;
+  align-items:flex-start;
+  gap:10px;
+  font-size:13px;
+  margin-bottom:6px;
+}
+.toggle span{
+  display:block;
+  word-break:break-word;
+  overflow-wrap:anywhere;
+  max-width:100%;
+}
+
 button{
-  width:100%;padding:14px;
-  background:var(--acc);color:#fff;
-  border:none;border-radius:12px;
-  font-size:16px;font-weight:600;
+  width:100%;
+  padding:14px;
+  background:var(--acc);
+  color:#fff;
+  border:none;
+  border-radius:12px;
+  font-size:16px;
+  font-weight:600;
 }
-.small{font-size:12px;color:var(--muted)}
+
 pre{
-  background:#050610;border-radius:10px;
-  padding:12px;font-size:12px;
-  overflow:auto;white-space:pre-wrap;
+  background:#050610;
+  border-radius:10px;
+  padding:12px;
+  font-size:12px;
+  overflow:auto;
+  white-space:pre-wrap;
 }
+
 .sticky{
-  position:sticky;bottom:0;background:linear-gradient(#0000,#0008);
+  position:sticky;
+  bottom:0;
+  background:linear-gradient(#0000,#0008);
   padding-top:8px;
 }
 </style>
@@ -54,9 +104,10 @@ pre{
 
 <body>
 <div class="wrapper">
+
 <h1>📡 Kali Wi-Fi Command Generator</h1>
 <div class="small">
-wlan1 = monitor (assumed) · wlan0 = SSH protected
+wlan1 = monitor assumed · wlan0 untouched (SSH safe)
 </div>
 
 <!-- TARGET -->
@@ -64,8 +115,10 @@ wlan1 = monitor (assumed) · wlan0 = SSH protected
 <h2>Target</h2>
 <label>BSSID</label>
 <input id="bssid" placeholder="AA:BB:CC:DD:EE:FF">
+
 <label>Channel</label>
 <input id="channel" placeholder="6">
+
 <label>Output prefix</label>
 <input id="out" value="audit">
 </div>
@@ -73,14 +126,20 @@ wlan1 = monitor (assumed) · wlan0 = SSH protected
 <!-- SCAN -->
 <div class="card">
 <h2>Scan / Capture</h2>
+
 <div class="toggle">
-<input type="checkbox" id="scan" checked> Passive scan
+  <input type="checkbox" id="scan" checked>
+  <span>Passive scan</span>
 </div>
+
 <div class="toggle">
-<input type="checkbox" id="handshake"> Handshake capture
+  <input type="checkbox" id="handshake">
+  <span>Handshake capture</span>
 </div>
+
 <div class="toggle">
-<input type="checkbox" id="deauth"> Targeted deauth (optional)
+  <input type="checkbox" id="deauth">
+  <span>Targeted deauth (optional)</span>
 </div>
 </div>
 
@@ -88,7 +147,8 @@ wlan1 = monitor (assumed) · wlan0 = SSH protected
 <div class="card">
 <h2>PMKID</h2>
 <div class="toggle">
-<input type="checkbox" id="pmkid"> PMKID capture (no client)
+  <input type="checkbox" id="pmkid">
+  <span>PMKID capture (no client required)</span>
 </div>
 </div>
 
@@ -96,8 +156,10 @@ wlan1 = monitor (assumed) · wlan0 = SSH protected
 <div class="card">
 <h2>Evil Twin / Captive</h2>
 <div class="toggle">
-<input type="checkbox" id="evil"> Fake AP
+  <input type="checkbox" id="evil">
+  <span>Fake AP + captive portal</span>
 </div>
+
 <label>SSID (optional)</label>
 <input id="ssid" placeholder="Clone or custom">
 </div>
@@ -105,13 +167,14 @@ wlan1 = monitor (assumed) · wlan0 = SSH protected
 <!-- CRACK -->
 <div class="card">
 <h2>Crack</h2>
+
 <label>Mode</label>
 <select id="crackmode">
-<option value="">None</option>
-<option value="wordlist">Wordlist</option>
-<option value="mask">Mask (no wordlist)</option>
-<option value="rule">Rule-based</option>
-<option value="inc">Incremental</option>
+  <option value="">None</option>
+  <option value="wordlist">Wordlist</option>
+  <option value="mask">Mask (no wordlist)</option>
+  <option value="rule">Rule-based</option>
+  <option value="inc">Incremental</option>
 </select>
 
 <label>Wordlist / Rule / Mask</label>
@@ -119,8 +182,8 @@ wlan1 = monitor (assumed) · wlan0 = SSH protected
 
 <label>Hashcat mode</label>
 <select id="hashmode">
-<option value="22000">22000 (WPA-PBKDF2)</option>
-<option value="16800">16800 (legacy)</option>
+  <option value="22000">22000 (WPA-PBKDF2)</option>
+  <option value="16800">16800 (legacy)</option>
 </select>
 </div>
 
@@ -133,18 +196,23 @@ wlan1 = monitor (assumed) · wlan0 = SSH protected
 <div class="sticky">
 <button onclick="generate()">Generate Commands</button>
 </div>
+
 </div>
 
 <script>
 function generate(){
-let b=[],B=bssid.value,C=channel.value,O=out.value||"audit";
+let b=[];
+let B=bssid.value.trim();
+let C=channel.value.trim();
+let O=out.value.trim()||"audit";
+
 b.push("# === Kali Wi-Fi Audit Script ===");
-b.push("# wlan1: monitor assumed");
-b.push("# wlan0: SSH preserved");
+b.push("# wlan1: monitor mode assumed");
+b.push("# wlan0: untouched (SSH safe)");
 b.push("");
 
 if(scan.checked){
-  b.push("# Scan");
+  b.push("# Passive scan");
   b.push(`airodump-ng wlan1${C?` -c ${C}`:""}${B?` --bssid ${B}`:""} -w ${O}_scan`);
   b.push("");
 }
@@ -153,7 +221,7 @@ if(handshake.checked){
   b.push("# Handshake capture");
   b.push(`airodump-ng wlan1${C?` -c ${C}`:""} --bssid ${B} -w ${O}_hs`);
   if(deauth.checked){
-    b.push(`# Optional targeted deauth`);
+    b.push("# Optional targeted deauth");
     b.push(`aireplay-ng --deauth 5 -a ${B} wlan1`);
   }
   b.push("");
@@ -167,30 +235,32 @@ if(pmkid.checked){
 }
 
 if(evil.checked){
-  b.push("# Evil Twin / Fake AP");
+  b.push("# Evil Twin / Captive Portal");
   b.push(`# SSID: ${ssid.value||"clone target"}`);
-  b.push(`hostapd hostapd.conf`);
-  b.push(`dnsmasq -C dnsmasq.conf`);
+  b.push("hostapd hostapd.conf");
+  b.push("dnsmasq -C dnsmasq.conf");
   b.push("");
 }
 
 if(crackmode.value){
   b.push("# Offline crack");
   let m=hashmode.value;
+  let opt=crackopt.value;
   if(crackmode.value==="wordlist")
-    b.push(`hashcat -m ${m} ${O}.22000 ${crackopt.value}`);
+    b.push(`hashcat -m ${m} ${O}.22000 ${opt}`);
   if(crackmode.value==="mask")
-    b.push(`hashcat -m ${m} ${O}.22000 ${crackopt.value}`);
+    b.push(`hashcat -m ${m} ${O}.22000 ${opt}`);
   if(crackmode.value==="rule")
-    b.push(`hashcat -m ${m} ${O}.22000 ${crackopt.value} -r ${crackopt.value}`);
+    b.push(`hashcat -m ${m} ${O}.22000 ${opt} -r ${opt}`);
   if(crackmode.value==="inc")
-    b.push(`hashcat -m ${m} ${O}.22000 -a 3 ${crackopt.value}`);
+    b.push(`hashcat -m ${m} ${O}.22000 -a 3 ${opt}`);
   b.push("");
 }
 
-b.push("# Cleanup not required (monitor persistent)");
+b.push("# Cleanup not required");
 outbox.textContent=b.join("\n");
 }
 </script>
+
 </body>
 </html>
