@@ -74,27 +74,27 @@ input, select{
 }
 
 /* ===== CHECKBOX ROW (iOS SAFE) ===== */
-.label-toggle{
+.toggle-row{
   display:flex;
   align-items:flex-start;
   gap:12px;
   font-size:14px;
   line-height:1.3;
   margin-bottom:10px;
-  cursor:pointer;
   max-width:100%;
 }
 
-.label-toggle input{
+.toggle-row input{
   margin-top:2px;
   flex-shrink:0;
 }
 
-.label-toggle span{
+.toggle-row span{
   display:block;
   max-width:100%;
   word-break:break-word;
   overflow-wrap:anywhere;
+  color:var(--txt);
 }
 
 /* ===== OUTPUT ===== */
@@ -181,29 +181,30 @@ Offline · Command text only · wlan1 = monitor · wlan0 = SSH safe
 <div class="card">
 <h2>Scan / Capture</h2>
 
-<label class="label-toggle">
+<div class="toggle-row">
   <input type="checkbox" id="scan" checked>
   <span>Passive scan (airodump)</span>
-</label>
+</div>
 
-<label class="label-toggle">
+<div class="toggle-row">
   <input type="checkbox" id="handshake">
   <span>Handshake capture</span>
-</label>
+</div>
 
-<label class="label-toggle">
+<div class="toggle-row">
   <input type="checkbox" id="deauth">
   <span>Targeted deauth (optional)</span>
-</label>
+</div>
 </div>
 
 <!-- PMKID -->
 <div class="card">
 <h2>PMKID</h2>
-<label class="label-toggle">
+
+<div class="toggle-row">
   <input type="checkbox" id="pmkid">
   <span>PMKID capture (no client required)</span>
-</label>
+</div>
 </div>
 
 <!-- CRACK -->
@@ -235,10 +236,10 @@ Offline · Command text only · wlan1 = monitor · wlan0 = SSH safe
 <details>
 <summary>Lab / Evil Twin</summary>
 
-<label class="label-toggle">
+<div class="toggle-row">
   <input type="checkbox" id="evil">
   <span>Evil Twin + Captive Portal (lab)</span>
-</label>
+</div>
 
 <label class="field">SSID (optional)</label>
 <input id="ssid" placeholder="Clone or custom">
