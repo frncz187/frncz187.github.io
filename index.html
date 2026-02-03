@@ -2,191 +2,194 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Wi-Fi Audit Toolkit</title>
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Kali Wi-Fi Command Generator</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 <style>
-:root {
-  --bg:#0d1117; --panel:#161b22; --text:#c9d1d9;
-  --accent:#2ea043; --warn:#d29922; --danger:#f85149;
-  --mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+:root{
+  --bg:#0f1220;--card:#171a2b;--line:#24284a;
+  --txt:#e6e8ff;--muted:#9aa0ff;--acc:#4f8cff;
+  --danger:#ff5c5c;
 }
-body { margin:0; font-family:var(--mono); background:var(--bg); color:var(--text); }
-header { padding:16px; font-size:20px; font-weight:bold; }
-nav { display:flex; gap:10px; padding:10px; border-bottom:1px solid #30363d; }
-nav button {
-  background:var(--panel); color:var(--text);
-  border:1px solid #30363d; padding:6px 10px; cursor:pointer;
+*{box-sizing:border-box}
+body{
+  margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto;
+  background:var(--bg);color:var(--txt);
 }
-nav button.active { border-color:var(--accent); color:var(--accent); }
-section { display:none; padding:16px; }
-section.active { display:block; }
-.panel { background:var(--panel); padding:12px; margin-bottom:12px; border:1px solid #30363d; }
-label { display:block; margin-top:8px; font-size:13px; }
-input, select, textarea {
-  width:100%; background:#0d1117; color:var(--text);
-  border:1px solid #30363d; padding:6px;
+.wrapper{max-width:420px;margin:auto;padding:12px}
+h1{font-size:20px;margin:8px 0}
+.card{
+  background:var(--card);border:1px solid var(--line);
+  border-radius:12px;padding:12px;margin-bottom:12px;
 }
-textarea { min-height:80px; }
-pre { background:#010409; padding:10px; overflow:auto; }
-.copy { background:var(--accent); border:none; padding:6px 10px; cursor:pointer; }
-.badge-ok { color:var(--accent); }
-.badge-warn { color:var(--warn); }
-.badge-no { color:var(--danger); }
+.card h2{font-size:15px;margin:0 0 8px}
+label{font-size:13px;color:var(--muted)}
+input,select,textarea{
+  width:100%;margin-top:4px;margin-bottom:8px;
+  background:#0b0d1a;color:var(--txt);
+  border:1px solid var(--line);border-radius:8px;
+  padding:10px;font-size:14px;
+}
+textarea{min-height:120px;font-family:ui-monospace,monospace}
+.inline{display:flex;gap:8px}
+.inline>*{flex:1}
+.toggle{display:flex;align-items:center;gap:8px;font-size:13px}
+button{
+  width:100%;padding:14px;
+  background:var(--acc);color:#fff;
+  border:none;border-radius:12px;
+  font-size:16px;font-weight:600;
+}
+.small{font-size:12px;color:var(--muted)}
+pre{
+  background:#050610;border-radius:10px;
+  padding:12px;font-size:12px;
+  overflow:auto;white-space:pre-wrap;
+}
+.sticky{
+  position:sticky;bottom:0;background:linear-gradient(#0000,#0008);
+  padding-top:8px;
+}
 </style>
 </head>
 
 <body>
-<header>📡 Wi-Fi Audit Toolkit (Web UI)</header>
+<div class="wrapper">
+<h1>📡 Kali Wi-Fi Command Generator</h1>
+<div class="small">
+wlan1 = monitor (assumed) · wlan0 = SSH protected
+</div>
 
-<nav>
-  <button onclick="show('gen')" class="active">Generator</button>
-  <button onclick="show('explain')">Explainer</button>
-  <button onclick="show('trouble')">Troubleshooter</button>
-  <button onclick="show('config')">Configs</button>
-  <button onclick="show('cheat')">Cheat-Sheet</button>
-</nav>
-
-<!-- ================= GENERATOR ================= -->
-<section id="gen" class="active">
-<div class="panel">
-<h3>Command Generator</h3>
-
-<label>Interface</label>
-<input id="iface" value="wlan1">
-
-<label>Channel</label>
-<input id="chan" placeholder="6">
-
+<!-- TARGET -->
+<div class="card">
+<h2>Target</h2>
 <label>BSSID</label>
 <input id="bssid" placeholder="AA:BB:CC:DD:EE:FF">
-
-<label>Output file</label>
-<input id="outfile" value="capture">
-
-<label><input type="checkbox" id="write"> Write capture</label>
-
-<button onclick="genCmd()">Generate</button>
-
-<pre id="genOut"></pre>
-<button class="copy" onclick="copy('genOut')">Copy</button>
-</div>
-</section>
-
-<!-- ================= EXPLAINER ================= -->
-<section id="explain">
-<div class="panel">
-<h3>Command Explainer</h3>
-<label>Paste command</label>
-<textarea id="cmdIn"></textarea>
-<button onclick="explain()">Explain</button>
-<pre id="expOut"></pre>
-</div>
-</section>
-
-<!-- ================= TROUBLESHOOTER ================= -->
-<section id="trouble">
-<div class="panel">
-<h3>Troubleshooter</h3>
-<label><input type="checkbox" id="t1"> No AP visible</label>
-<label><input type="checkbox" id="t2"> AP visible, no clients</label>
-<label><input type="checkbox" id="t3"> No handshake</label>
-<label><input type="checkbox" id="t4"> Crack failed</label>
-<button onclick="trouble()">Diagnose</button>
-<pre id="trOut"></pre>
-</div>
-</section>
-
-<!-- ================= CONFIG ================= -->
-<section id="config">
-<div class="panel">
-<h3>hostapd.conf</h3>
-<label>SSID</label><input id="ssid" value="FreeWiFi">
-<label>Channel</label><input id="cchan" value="6">
-<pre id="hostapd"></pre>
-<button onclick="genConfig()">Generate</button>
+<label>Channel</label>
+<input id="channel" placeholder="6">
+<label>Output prefix</label>
+<input id="out" value="audit">
 </div>
 
-<div class="panel">
-<h3>dnsmasq.conf</h3>
-<pre id="dnsmasq"></pre>
+<!-- SCAN -->
+<div class="card">
+<h2>Scan / Capture</h2>
+<div class="toggle">
+<input type="checkbox" id="scan" checked> Passive scan
 </div>
-</section>
-
-<!-- ================= CHEAT ================= -->
-<section id="cheat">
-<div class="panel">
-<h3>Wi-Fi Cheat-Sheet</h3>
-<pre>
-Scan:
-  iw dev wlan1 scan
-  airodump-ng wlan1
-
-Monitor:
-  ip link set wlan1 down
-  iw dev wlan1 set type monitor
-  ip link set wlan1 up
-
-Capture:
-  airodump-ng wlan1 -c 6 --bssid XX -w cap
-
-AP:
-  hostapd hostapd.conf
-  dnsmasq -C dnsmasq.conf
-</pre>
+<div class="toggle">
+<input type="checkbox" id="handshake"> Handshake capture
 </div>
-</section>
+<div class="toggle">
+<input type="checkbox" id="deauth"> Targeted deauth (optional)
+</div>
+</div>
+
+<!-- PMKID -->
+<div class="card">
+<h2>PMKID</h2>
+<div class="toggle">
+<input type="checkbox" id="pmkid"> PMKID capture (no client)
+</div>
+</div>
+
+<!-- EVIL TWIN -->
+<div class="card">
+<h2>Evil Twin / Captive</h2>
+<div class="toggle">
+<input type="checkbox" id="evil"> Fake AP
+</div>
+<label>SSID (optional)</label>
+<input id="ssid" placeholder="Clone or custom">
+</div>
+
+<!-- CRACK -->
+<div class="card">
+<h2>Crack</h2>
+<label>Mode</label>
+<select id="crackmode">
+<option value="">None</option>
+<option value="wordlist">Wordlist</option>
+<option value="mask">Mask (no wordlist)</option>
+<option value="rule">Rule-based</option>
+<option value="inc">Incremental</option>
+</select>
+
+<label>Wordlist / Rule / Mask</label>
+<input id="crackopt" placeholder="rockyou.txt / ?l?l?d?d / rules/best64.rule">
+
+<label>Hashcat mode</label>
+<select id="hashmode">
+<option value="22000">22000 (WPA-PBKDF2)</option>
+<option value="16800">16800 (legacy)</option>
+</select>
+</div>
+
+<!-- OUTPUT -->
+<div class="card">
+<h2>Generated Script</h2>
+<pre id="outbox"></pre>
+</div>
+
+<div class="sticky">
+<button onclick="generate()">Generate Commands</button>
+</div>
+</div>
 
 <script>
-function show(id){
-  document.querySelectorAll('section').forEach(s=>s.classList.remove('active'));
-  document.querySelectorAll('nav button').forEach(b=>b.classList.remove('active'));
-  document.getElementById(id).classList.add('active');
-  event.target.classList.add('active');
+function generate(){
+let b=[],B=bssid.value,C=channel.value,O=out.value||"audit";
+b.push("# === Kali Wi-Fi Audit Script ===");
+b.push("# wlan1: monitor assumed");
+b.push("# wlan0: SSH preserved");
+b.push("");
+
+if(scan.checked){
+  b.push("# Scan");
+  b.push(`airodump-ng wlan1${C?` -c ${C}`:""}${B?` --bssid ${B}`:""} -w ${O}_scan`);
+  b.push("");
 }
 
-function genCmd(){
-  let c = `airodump-ng ${iface.value}`;
-  if(chan.value) c+=` -c ${chan.value}`;
-  if(bssid.value) c+=` --bssid ${bssid.value}`;
-  if(write.checked) c+=` -w ${outfile.value}`;
-  genOut.textContent = c;
+if(handshake.checked){
+  b.push("# Handshake capture");
+  b.push(`airodump-ng wlan1${C?` -c ${C}`:""} --bssid ${B} -w ${O}_hs`);
+  if(deauth.checked){
+    b.push(`# Optional targeted deauth`);
+    b.push(`aireplay-ng --deauth 5 -a ${B} wlan1`);
+  }
+  b.push("");
 }
 
-function explain(){
-  let t = cmdIn.value.split(" ");
-  let out="";
-  t.forEach(x=>{
-    if(x=="airodump-ng") out+="airodump-ng → capture tool\n";
-    else if(x=="-c") out+="-c → channel\n";
-    else if(x=="--bssid") out+="--bssid → target AP\n";
-    else if(x=="-w") out+="-w → output file\n";
-  });
-  expOut.textContent = out || "No known parameters detected.";
+if(pmkid.checked){
+  b.push("# PMKID capture");
+  b.push(`hcxdumptool -i wlan1 -o ${O}_pmkid.pcapng --enable_status=1`);
+  b.push(`hcxpcapngtool -o ${O}.22000 ${O}_pmkid.pcapng`);
+  b.push("");
 }
 
-function trouble(){
-  let r="";
-  if(t1.checked) r+="No AP → check driver / region / antenna\n";
-  if(t2.checked) r+="No clients → wait / force reconnect\n";
-  if(t3.checked) r+="No handshake → power save / client activity\n";
-  if(t4.checked) r+="Crack failed → wordlist / hash issue\n";
-  trOut.textContent = r || "Select at least one issue.";
+if(evil.checked){
+  b.push("# Evil Twin / Fake AP");
+  b.push(`# SSID: ${ssid.value||"clone target"}`);
+  b.push(`hostapd hostapd.conf`);
+  b.push(`dnsmasq -C dnsmasq.conf`);
+  b.push("");
 }
 
-function genConfig(){
-hostapd.textContent =
-`interface=wlan1
-ssid=${ssid.value}
-channel=${cchan.value}
-hw_mode=g
-auth_algs=1`;
-dnsmasq.textContent =
-`interface=wlan1
-dhcp-range=192.168.4.10,192.168.4.50,12h`;
+if(crackmode.value){
+  b.push("# Offline crack");
+  let m=hashmode.value;
+  if(crackmode.value==="wordlist")
+    b.push(`hashcat -m ${m} ${O}.22000 ${crackopt.value}`);
+  if(crackmode.value==="mask")
+    b.push(`hashcat -m ${m} ${O}.22000 ${crackopt.value}`);
+  if(crackmode.value==="rule")
+    b.push(`hashcat -m ${m} ${O}.22000 ${crackopt.value} -r ${crackopt.value}`);
+  if(crackmode.value==="inc")
+    b.push(`hashcat -m ${m} ${O}.22000 -a 3 ${crackopt.value}`);
+  b.push("");
 }
 
-function copy(id){
-  navigator.clipboard.writeText(document.getElementById(id).textContent);
+b.push("# Cleanup not required (monitor persistent)");
+outbox.textContent=b.join("\n");
 }
 </script>
 </body>
