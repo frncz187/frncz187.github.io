@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Wi‑Fi Audit Command Generator – MAX v1.0.0</title>
+<title>Wi‑Fi Audit Command Generator – MAX v1.1.0</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
 <style>
@@ -14,6 +14,7 @@
   --muted:#9aa0ff;
   --acc:#4f8cff;
   --warn:#ffb84f;
+  --danger:#ff5c5c;
   --ok:#4cff8f;
 }
 
@@ -75,13 +76,6 @@ label.cb{
 
 label.cb input{margin-right:8px}
 
-details summary{
-  cursor:pointer;
-  font-size:14px;
-  color:var(--acc);
-  margin-bottom:8px;
-}
-
 .badge{
   display:inline-block;
   font-size:11px;
@@ -91,6 +85,8 @@ details summary{
   color:var(--warn);
   margin-left:6px;
 }
+
+.badge.danger{color:var(--danger)}
 
 pre{
   background:#050610;
@@ -138,95 +134,60 @@ button{
 <div class="wrapper">
 
 <h1>📡 Wi‑Fi Audit Command Generator</h1>
-<div class="small">Version v1.0.0‑MAX · Offline · wlan1 monitor only</div>
+<div class="small">Version v1.1.0‑MAX‑INTEGRATED · Offline · wlan1 monitor only</div>
 
 <!-- TARGET -->
 <div class="card">
 <h2>Target</h2>
 <label class="field">BSSID</label>
-<input id="bssid" placeholder="AA:BB:CC:DD:EE:FF">
-
+<input id="bssid">
 <label class="field">Channel</label>
-<input id="channel" placeholder="6">
-
+<input id="channel">
 <label class="field">Output prefix</label>
 <input id="out" value="audit">
 </div>
 
-<!-- DISCOVERY -->
+<!-- HCXTOOLS -->
 <div class="card">
-<h2>Monitoring & Discovery</h2>
-<label class="cb"><input type="checkbox" id="scan" checked> Passive scan (airodump)</label>
-<label class="cb"><input type="checkbox" id="scan_all"> All‑channel scan</label>
-<label class="cb"><input type="checkbox" id="clients"> Client‑only tracking</label>
-<label class="cb"><input type="checkbox" id="hidden"> Reveal hidden SSIDs</label>
+<h2>HCXTOOLS (Modern WPA)</h2>
+<label class="cb"><input type="checkbox" id="hcx"> PMKID / M1M2 capture</label>
+<label class="cb"><input type="checkbox" id="hcx_active"> Active scan</label>
 </div>
 
-<!-- CLIENT ATTACKS -->
+<!-- BETTERCAP -->
 <div class="card">
-<h2>Client Attacks</h2>
-<label class="cb"><input type="checkbox" id="deauth_ap"> Deauth AP → all clients</label>
-<label class="cb"><input type="checkbox" id="deauth_client"> Deauth specific client</label>
-<input id="clientmac" placeholder="Client MAC (optional)">
-<label class="field">Deauth count</label>
-<input id="deauthcount" value="5">
+<h2>Bettercap <span class="badge">framework</span></h2>
+<label class="cb"><input type="checkbox" id="bettercap"> Wi‑Fi recon caplet</label>
 </div>
 
-<!-- HANDSHAKE -->
+<!-- CONTROL -->
 <div class="card">
-<h2>Handshake / PMKID</h2>
-<label class="cb"><input type="checkbox" id="handshake"> Capture WPA handshake</label>
-<label class="cb"><input type="checkbox" id="pmkid"> PMKID capture (no client)</label>
-<label class="cb"><input type="checkbox" id="retry"> Retry capture (loop)</label>
+<h2>Wi‑Fi Control</h2>
+<label class="cb"><input type="checkbox" id="iwdev"> Show interfaces</label>
+<label class="cb"><input type="checkbox" id="setchan"> Set channel</label>
 </div>
 
-<!-- AP / BEACON -->
+<!-- PACKET -->
 <div class="card">
-<h2>AP / Beacon Attacks <span class="badge">lab</span></h2>
-<label class="cb"><input type="checkbox" id="beacon"> Beacon flood</label>
-<label class="cb"><input type="checkbox" id="karma"> Karma / probe responder</label>
-<textarea id="ssidlist" placeholder="SSID list (one per line)"></textarea>
+<h2>Packet Capture</h2>
+<label class="cb"><input type="checkbox" id="tcpdump"> tcpdump raw capture</label>
+<label class="cb"><input type="checkbox" id="tshark"> tshark analysis</label>
 </div>
 
-<!-- EVIL TWIN -->
+<!-- NETWORK DISCOVERY -->
 <div class="card">
-<h2>Evil Twin PRO <span class="badge">lab</span></h2>
-<label class="cb"><input type="checkbox" id="evil"> Enable Evil Twin</label>
-<label class="field">SSID</label>
-<input id="evilssid">
-<label class="cb"><input type="checkbox" id="dns"> DNS spoof</label>
-<label class="cb"><input type="checkbox" id="auto_deauth"> Auto‑deauth real AP</label>
+<h2>Network Discovery</h2>
+<label class="cb"><input type="checkbox" id="nmap"> nmap discovery</label>
+<label class="cb"><input type="checkbox" id="netdiscover"> netdiscover</label>
+<label class="cb"><input type="checkbox" id="arpscan"> arp‑scan</label>
+<input id="netrange" placeholder="192.168.1.0/24">
 </div>
 
-<!-- HASHCAT -->
+<!-- MITM -->
 <div class="card">
-<h2>Offline Crack (Hashcat)</h2>
-<label class="field">Attack mode</label>
-<select id="attack">
-<option value="">None</option>
-<option value="0">Wordlist</option>
-<option value="1">Combinator</option>
-<option value="3">Mask</option>
-<option value="6">Hybrid WL+Mask</option>
-<option value="7">Hybrid Mask+WL</option>
-</select>
-<input id="wl1" placeholder="Wordlist 1 / mask">
-<input id="wl2" placeholder="Wordlist 2 (if needed)">
-<label class="field">Workload</label>
-<select id="workload">
-<option value="1">Low</option>
-<option value="2">Default</option>
-<option value="3">High</option>
-<option value="4">Insane</option>
-</select>
-</div>
-
-<!-- POST -->
-<div class="card">
-<h2>Post‑Processing</h2>
-<label class="cb"><input type="checkbox" id="convert"> Convert cap → 22000</label>
-<label class="cb"><input type="checkbox" id="validate"> Validate handshake</label>
-<label class="cb"><input type="checkbox" id="strip"> Strip duplicates</label>
+<h2>MITM / Credential <span class="badge danger">LAB</span></h2>
+<label class="cb"><input type="checkbox" id="ettercap"> ettercap MITM</label>
+<label class="cb"><input type="checkbox" id="responder"> responder</label>
 </div>
 
 <!-- OUTPUT -->
@@ -249,39 +210,64 @@ function gen(){
   const B=bssid.value.trim();
   const C=channel.value.trim();
   const O=out.value.trim()||"audit";
+  const R=netrange.value||"192.168.1.0/24";
 
-  b.push("# Wi‑Fi Audit Script – v1.0.0‑MAX");
-  b.push("# wlan1 monitor only\n");
+  b.push("# Kali Audit Script – v1.1.0‑MAX‑INTEGRATED");
+  b.push("# Offline command generator\n");
 
-  if(scan.checked)
-    b.push(`airodump-ng wlan1 ${C?`-c ${C}`:""} ${B?`--bssid ${B}`:""} -w ${O}_scan\n`);
-
-  if(deauth_ap.checked)
-    b.push(`aireplay-ng --deauth ${deauthcount.value} -a ${B} wlan1\n`);
-
-  if(deauth_client.checked)
-    b.push(`aireplay-ng --deauth ${deauthcount.value} -a ${B} -c ${clientmac.value} wlan1\n`);
-
-  if(handshake.checked)
-    b.push(`airodump-ng wlan1 -c ${C} --bssid ${B} -w ${O}_hs\n`);
-
-  if(pmkid.checked){
-    b.push(`hcxdumptool -i wlan1 -o ${O}.pcapng`);
+  if(hcx.checked){
+    b.push("# HCXTOOLS");
+    b.push(`hcxdumptool -i wlan1 -o ${O}.pcapng ${hcx_active.checked?"--active_beacon":""}`);
     b.push(`hcxpcapngtool -o ${O}.22000 ${O}.pcapng\n`);
   }
 
-  if(beacon.checked)
-    b.push(`mdk4 wlan1 b -f ssids.txt\n`);
-
-  if(evil.checked){
-    b.push(`# Evil Twin`);
-    b.push(`hostapd hostapd.conf`);
-    if(dns.checked) b.push(`dnsmasq -C dnsmasq.conf`);
-    b.push("");
+  if(bettercap.checked){
+    b.push("# BETTERCAP");
+    b.push("bettercap -iface wlan1 -caplet wifi-recon\n");
   }
 
-  if(attack.value){
-    b.push(`hashcat -m 22000 -a ${attack.value} ${O}.22000 ${wl1.value} ${wl2.value||""} -w ${workload.value}\n`);
+  if(iwdev.checked){
+    b.push("# IW");
+    b.push("iw dev\n");
+  }
+
+  if(setchan.checked && C){
+    b.push(`iw dev wlan1 set channel ${C}\n`);
+  }
+
+  if(tcpdump.checked){
+    b.push("# TCPDUMP");
+    b.push(`tcpdump -i wlan1 -w ${O}_raw.pcap\n`);
+  }
+
+  if(tshark.checked){
+    b.push("# TSHARK");
+    b.push(`tshark -r ${O}_raw.pcap\n`);
+  }
+
+  if(nmap.checked){
+    b.push("# NMAP");
+    b.push(`nmap -sn ${R}\n`);
+  }
+
+  if(netdiscover.checked){
+    b.push("# NETDISCOVER");
+    b.push(`netdiscover -r ${R}\n`);
+  }
+
+  if(arpscan.checked){
+    b.push("# ARP-SCAN");
+    b.push(`arp-scan --localnet\n`);
+  }
+
+  if(ettercap.checked){
+    b.push("# ETTERCAP (LAB)");
+    b.push("ettercap -T -q -i eth0 -M arp:remote /victim/ /gateway/\n");
+  }
+
+  if(responder.checked){
+    b.push("# RESPONDER (LAB)");
+    b.push("responder -I eth0 -rdw\n");
   }
 
   outbox.textContent=b.join("\n");
