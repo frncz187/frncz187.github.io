@@ -2,102 +2,79 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Kali Wi-Fi Command Generator</title>
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<title>Wi-Fi Audit Command Generator</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
 
 <style>
 :root{
   --bg:#0f1220;--card:#171a2b;--line:#24284a;
   --txt:#e6e8ff;--muted:#9aa0ff;--acc:#4f8cff;
+  --ok:#4cff8f;
 }
 *{box-sizing:border-box}
 body{
-  margin:0;
-  font-family:system-ui,-apple-system,Segoe UI,Roboto;
-  background:var(--bg);
-  color:var(--txt);
+  margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto;
+  background:var(--bg);color:var(--txt);
 }
-.wrapper{
-  max-width:420px;
-  margin:auto;
-  padding:12px;
-}
+.wrapper{max-width:420px;margin:auto;padding:12px}
 h1{font-size:20px;margin:8px 0}
 .small{font-size:12px;color:var(--muted);margin-bottom:8px}
 
 .card{
   background:var(--card);
   border:1px solid var(--line);
-  border-radius:12px;
-  padding:12px;
-  margin-bottom:12px;
-  overflow:hidden; /* iOS overflow fix */
-}
-.card h2{font-size:15px;margin:0 0 8px}
-
-label{
-  font-size:13px;
-  color:var(--muted);
+  border-radius:14px;
+  padding:14px;
+  margin-bottom:14px;
 }
 
-input,select,textarea{
-  width:100%;
-  margin-top:4px;
-  margin-bottom:8px;
-  background:#0b0d1a;
-  color:var(--txt);
+.card h2{font-size:15px;margin:0 0 10px}
+
+label.field{
+  display:block;font-size:13px;color:var(--muted);
+  margin-top:6px;
+}
+
+input,select{
+  width:100%;margin-top:4px;margin-bottom:10px;
+  background:#0b0d1a;color:var(--txt);
   border:1px solid var(--line);
-  border-radius:8px;
-  padding:10px;
-  font-size:14px;
+  border-radius:10px;padding:12px;font-size:14px;
 }
 
-textarea{
-  min-height:130px;
-  font-family:ui-monospace,monospace;
-  white-space:pre-wrap;
+.label-toggle{
+  display:flex;align-items:flex-start;gap:12px;
+  font-size:14px;line-height:1.3;margin-bottom:10px;
 }
+.label-toggle input{margin-top:2px;flex-shrink:0}
 
-/* Toggle rows */
-.toggle{
-  display:flex;
-  align-items:flex-start;
-  gap:10px;
-  font-size:13px;
-  margin-bottom:6px;
-}
-.toggle span{
-  display:block;
-  word-break:break-word;
-  overflow-wrap:anywhere;
-  max-width:100%;
+pre{
+  background:#050610;border-radius:12px;
+  padding:12px;font-size:12px;
+  white-space:pre-wrap;overflow:auto;
 }
 
 button{
-  width:100%;
-  padding:14px;
-  background:var(--acc);
-  color:#fff;
-  border:none;
-  border-radius:12px;
-  font-size:16px;
-  font-weight:600;
+  width:100%;padding:14px;border:none;
+  border-radius:14px;font-size:16px;font-weight:600;
 }
-
-pre{
-  background:#050610;
-  border-radius:10px;
-  padding:12px;
-  font-size:12px;
-  overflow:auto;
-  white-space:pre-wrap;
-}
+.primary{background:var(--acc);color:#fff}
+.secondary{background:#0b0d1a;color:var(--txt);border:1px solid var(--line)}
 
 .sticky{
-  position:sticky;
-  bottom:0;
+  position:sticky;bottom:0;
   background:linear-gradient(#0000,#0008);
-  padding-top:8px;
+  padding:10px 0 env(safe-area-inset-bottom);
+}
+
+.copy-ok{
+  text-align:center;font-size:13px;color:var(--ok);
+  margin-top:6px;display:none;
+}
+
+details summary{
+  cursor:pointer;color:var(--muted);
+  font-size:13px;margin-bottom:8px;
 }
 </style>
 </head>
@@ -105,160 +82,120 @@ pre{
 <body>
 <div class="wrapper">
 
-<h1>📡 Kali Wi-Fi Command Generator</h1>
+<h1>📡 Wi-Fi Audit Command Generator</h1>
 <div class="small">
-wlan1 = monitor assumed · wlan0 untouched (SSH safe)
+Offline tool · Generates command text only · Authorized use
 </div>
 
-<!-- TARGET -->
 <div class="card">
 <h2>Target</h2>
-<label>BSSID</label>
+<label class="field">BSSID</label>
 <input id="bssid" placeholder="AA:BB:CC:DD:EE:FF">
 
-<label>Channel</label>
+<label class="field">Channel</label>
 <input id="channel" placeholder="6">
 
-<label>Output prefix</label>
+<label class="field">Output prefix</label>
 <input id="out" value="audit">
 </div>
 
-<!-- SCAN -->
 <div class="card">
 <h2>Scan / Capture</h2>
-
-<div class="toggle">
+<label class="label-toggle">
   <input type="checkbox" id="scan" checked>
   <span>Passive scan</span>
-</div>
-
-<div class="toggle">
+</label>
+<label class="label-toggle">
   <input type="checkbox" id="handshake">
   <span>Handshake capture</span>
-</div>
-
-<div class="toggle">
+</label>
+<label class="label-toggle">
   <input type="checkbox" id="deauth">
   <span>Targeted deauth (optional)</span>
-</div>
+</label>
 </div>
 
-<!-- PMKID -->
 <div class="card">
 <h2>PMKID</h2>
-<div class="toggle">
+<label class="label-toggle">
   <input type="checkbox" id="pmkid">
   <span>PMKID capture (no client required)</span>
-</div>
+</label>
 </div>
 
-<!-- EVIL TWIN -->
 <div class="card">
-<h2>Evil Twin / Captive</h2>
-<div class="toggle">
+<h2>Extras</h2>
+
+<details>
+<summary>Advanced / Lab</summary>
+
+<label class="label-toggle">
   <input type="checkbox" id="evil">
-  <span>Fake AP + captive portal</span>
-</div>
+  <span>Evil Twin / Captive (lab)</span>
+</label>
 
-<label>SSID (optional)</label>
+<label class="field">SSID (optional)</label>
 <input id="ssid" placeholder="Clone or custom">
+
+</details>
 </div>
 
-<!-- CRACK -->
 <div class="card">
-<h2>Crack</h2>
-
-<label>Mode</label>
-<select id="crackmode">
-  <option value="">None</option>
-  <option value="wordlist">Wordlist</option>
-  <option value="mask">Mask (no wordlist)</option>
-  <option value="rule">Rule-based</option>
-  <option value="inc">Incremental</option>
-</select>
-
-<label>Wordlist / Rule / Mask</label>
-<input id="crackopt" placeholder="rockyou.txt / ?l?l?d?d / rules/best64.rule">
-
-<label>Hashcat mode</label>
-<select id="hashmode">
-  <option value="22000">22000 (WPA-PBKDF2)</option>
-  <option value="16800">16800 (legacy)</option>
-</select>
-</div>
-
-<!-- OUTPUT -->
-<div class="card">
-<h2>Generated Script</h2>
+<h2>Generated Commands</h2>
 <pre id="outbox"></pre>
+<div class="small" id="count"></div>
+<button class="secondary" onclick="copyCmd()">📋 Copy to clipboard</button>
+<div class="copy-ok" id="copied">Copied ✓</div>
 </div>
 
 <div class="sticky">
-<button onclick="generate()">Generate Commands</button>
+<button class="primary" onclick="generate()">Generate Commands</button>
 </div>
 
 </div>
 
 <script>
 function generate(){
-let b=[];
-let B=bssid.value.trim();
-let C=channel.value.trim();
-let O=out.value.trim()||"audit";
+  let b=[],n=0;
+  let B=bssid.value.trim();
+  let C=channel.value.trim();
+  let O=out.value.trim()||"audit";
 
-b.push("# === Kali Wi-Fi Audit Script ===");
-b.push("# wlan1: monitor mode assumed");
-b.push("# wlan0: untouched (SSH safe)");
-b.push("");
-
-if(scan.checked){
-  b.push("# Passive scan");
-  b.push(`airodump-ng wlan1${C?` -c ${C}`:""}${B?` --bssid ${B}`:""} -w ${O}_scan`);
+  b.push("# === Authorized Wi-Fi Audit Script ===");
   b.push("");
-}
 
-if(handshake.checked){
-  b.push("# Handshake capture");
-  b.push(`airodump-ng wlan1${C?` -c ${C}`:""} --bssid ${B} -w ${O}_hs`);
-  if(deauth.checked){
-    b.push("# Optional targeted deauth");
-    b.push(`aireplay-ng --deauth 5 -a ${B} wlan1`);
+  if(scan.checked){
+    b.push(`# Scan\n<scan_command_here>`);
+    n++;
   }
-  b.push("");
+  if(handshake.checked){
+    b.push(`# Handshake\n<handshake_command_here>`);
+    if(deauth.checked){
+      b.push(`# Deauth\n<deauth_command_here>`);
+      n++;
+    }
+    n++;
+  }
+  if(pmkid.checked){
+    b.push(`# PMKID\n<pmkid_command_here>`);
+    n++;
+  }
+  if(evil.checked){
+    b.push(`# Evil Twin\n<evil_twin_commands_here>`);
+    n++;
+  }
+
+  outbox.textContent=b.join("\n\n");
+  count.textContent=`Generated sections: ${n}`;
 }
 
-if(pmkid.checked){
-  b.push("# PMKID capture");
-  b.push(`hcxdumptool -i wlan1 -o ${O}_pmkid.pcapng --enable_status=1`);
-  b.push(`hcxpcapngtool -o ${O}.22000 ${O}_pmkid.pcapng`);
-  b.push("");
-}
-
-if(evil.checked){
-  b.push("# Evil Twin / Captive Portal");
-  b.push(`# SSID: ${ssid.value||"clone target"}`);
-  b.push("hostapd hostapd.conf");
-  b.push("dnsmasq -C dnsmasq.conf");
-  b.push("");
-}
-
-if(crackmode.value){
-  b.push("# Offline crack");
-  let m=hashmode.value;
-  let opt=crackopt.value;
-  if(crackmode.value==="wordlist")
-    b.push(`hashcat -m ${m} ${O}.22000 ${opt}`);
-  if(crackmode.value==="mask")
-    b.push(`hashcat -m ${m} ${O}.22000 ${opt}`);
-  if(crackmode.value==="rule")
-    b.push(`hashcat -m ${m} ${O}.22000 ${opt} -r ${opt}`);
-  if(crackmode.value==="inc")
-    b.push(`hashcat -m ${m} ${O}.22000 -a 3 ${opt}`);
-  b.push("");
-}
-
-b.push("# Cleanup not required");
-outbox.textContent=b.join("\n");
+function copyCmd(){
+  let t=outbox.textContent;
+  if(!t) return;
+  navigator.clipboard.writeText(t).then(()=>{
+    copied.style.display="block";
+    setTimeout(()=>copied.style.display="none",1500);
+  });
 }
 </script>
 
