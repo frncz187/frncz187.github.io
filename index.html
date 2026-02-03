@@ -1,38 +1,193 @@
 <!DOCTYPE html>
-<html lang="hu">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>FRNCZ Pixel</title>
+<title>Wi-Fi Audit Toolkit</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <style>
-    body {
-        margin: 0;
-        height: 100vh;
-        background-color: #131211;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        font-family: 'Courier New', monospace;
-    }
-
-    .pixel-text {
-        color: #ffffff;
-        font-size: 6vw; /* reszponzív méret */
-        letter-spacing: 0.5ch;
-        text-shadow:
-            1px 1px #0f0,
-            2px 2px #0f0,
-            3px 3px #0f0; /* zöld pixel hacker-es fény */
-    }
-
-    @media (max-width: 600px) {
-        .pixel-text {
-            font-size: 12vw;
-        }
-    }
+:root {
+  --bg:#0d1117; --panel:#161b22; --text:#c9d1d9;
+  --accent:#2ea043; --warn:#d29922; --danger:#f85149;
+  --mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+}
+body { margin:0; font-family:var(--mono); background:var(--bg); color:var(--text); }
+header { padding:16px; font-size:20px; font-weight:bold; }
+nav { display:flex; gap:10px; padding:10px; border-bottom:1px solid #30363d; }
+nav button {
+  background:var(--panel); color:var(--text);
+  border:1px solid #30363d; padding:6px 10px; cursor:pointer;
+}
+nav button.active { border-color:var(--accent); color:var(--accent); }
+section { display:none; padding:16px; }
+section.active { display:block; }
+.panel { background:var(--panel); padding:12px; margin-bottom:12px; border:1px solid #30363d; }
+label { display:block; margin-top:8px; font-size:13px; }
+input, select, textarea {
+  width:100%; background:#0d1117; color:var(--text);
+  border:1px solid #30363d; padding:6px;
+}
+textarea { min-height:80px; }
+pre { background:#010409; padding:10px; overflow:auto; }
+.copy { background:var(--accent); border:none; padding:6px 10px; cursor:pointer; }
+.badge-ok { color:var(--accent); }
+.badge-warn { color:var(--warn); }
+.badge-no { color:var(--danger); }
 </style>
 </head>
+
 <body>
-    <div class="pixel-text">FRNCZ</div>
+<header>📡 Wi-Fi Audit Toolkit (Web UI)</header>
+
+<nav>
+  <button onclick="show('gen')" class="active">Generator</button>
+  <button onclick="show('explain')">Explainer</button>
+  <button onclick="show('trouble')">Troubleshooter</button>
+  <button onclick="show('config')">Configs</button>
+  <button onclick="show('cheat')">Cheat-Sheet</button>
+</nav>
+
+<!-- ================= GENERATOR ================= -->
+<section id="gen" class="active">
+<div class="panel">
+<h3>Command Generator</h3>
+
+<label>Interface</label>
+<input id="iface" value="wlan1">
+
+<label>Channel</label>
+<input id="chan" placeholder="6">
+
+<label>BSSID</label>
+<input id="bssid" placeholder="AA:BB:CC:DD:EE:FF">
+
+<label>Output file</label>
+<input id="outfile" value="capture">
+
+<label><input type="checkbox" id="write"> Write capture</label>
+
+<button onclick="genCmd()">Generate</button>
+
+<pre id="genOut"></pre>
+<button class="copy" onclick="copy('genOut')">Copy</button>
+</div>
+</section>
+
+<!-- ================= EXPLAINER ================= -->
+<section id="explain">
+<div class="panel">
+<h3>Command Explainer</h3>
+<label>Paste command</label>
+<textarea id="cmdIn"></textarea>
+<button onclick="explain()">Explain</button>
+<pre id="expOut"></pre>
+</div>
+</section>
+
+<!-- ================= TROUBLESHOOTER ================= -->
+<section id="trouble">
+<div class="panel">
+<h3>Troubleshooter</h3>
+<label><input type="checkbox" id="t1"> No AP visible</label>
+<label><input type="checkbox" id="t2"> AP visible, no clients</label>
+<label><input type="checkbox" id="t3"> No handshake</label>
+<label><input type="checkbox" id="t4"> Crack failed</label>
+<button onclick="trouble()">Diagnose</button>
+<pre id="trOut"></pre>
+</div>
+</section>
+
+<!-- ================= CONFIG ================= -->
+<section id="config">
+<div class="panel">
+<h3>hostapd.conf</h3>
+<label>SSID</label><input id="ssid" value="FreeWiFi">
+<label>Channel</label><input id="cchan" value="6">
+<pre id="hostapd"></pre>
+<button onclick="genConfig()">Generate</button>
+</div>
+
+<div class="panel">
+<h3>dnsmasq.conf</h3>
+<pre id="dnsmasq"></pre>
+</div>
+</section>
+
+<!-- ================= CHEAT ================= -->
+<section id="cheat">
+<div class="panel">
+<h3>Wi-Fi Cheat-Sheet</h3>
+<pre>
+Scan:
+  iw dev wlan1 scan
+  airodump-ng wlan1
+
+Monitor:
+  ip link set wlan1 down
+  iw dev wlan1 set type monitor
+  ip link set wlan1 up
+
+Capture:
+  airodump-ng wlan1 -c 6 --bssid XX -w cap
+
+AP:
+  hostapd hostapd.conf
+  dnsmasq -C dnsmasq.conf
+</pre>
+</div>
+</section>
+
+<script>
+function show(id){
+  document.querySelectorAll('section').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('nav button').forEach(b=>b.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  event.target.classList.add('active');
+}
+
+function genCmd(){
+  let c = `airodump-ng ${iface.value}`;
+  if(chan.value) c+=` -c ${chan.value}`;
+  if(bssid.value) c+=` --bssid ${bssid.value}`;
+  if(write.checked) c+=` -w ${outfile.value}`;
+  genOut.textContent = c;
+}
+
+function explain(){
+  let t = cmdIn.value.split(" ");
+  let out="";
+  t.forEach(x=>{
+    if(x=="airodump-ng") out+="airodump-ng → capture tool\n";
+    else if(x=="-c") out+="-c → channel\n";
+    else if(x=="--bssid") out+="--bssid → target AP\n";
+    else if(x=="-w") out+="-w → output file\n";
+  });
+  expOut.textContent = out || "No known parameters detected.";
+}
+
+function trouble(){
+  let r="";
+  if(t1.checked) r+="No AP → check driver / region / antenna\n";
+  if(t2.checked) r+="No clients → wait / force reconnect\n";
+  if(t3.checked) r+="No handshake → power save / client activity\n";
+  if(t4.checked) r+="Crack failed → wordlist / hash issue\n";
+  trOut.textContent = r || "Select at least one issue.";
+}
+
+function genConfig(){
+hostapd.textContent =
+`interface=wlan1
+ssid=${ssid.value}
+channel=${cchan.value}
+hw_mode=g
+auth_algs=1`;
+dnsmasq.textContent =
+`interface=wlan1
+dhcp-range=192.168.4.10,192.168.4.50,12h`;
+}
+
+function copy(id){
+  navigator.clipboard.writeText(document.getElementById(id).textContent);
+}
+</script>
 </body>
 </html>
