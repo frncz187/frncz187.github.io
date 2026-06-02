@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Flappy Joci & Beni</title>
+  <style>
+    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+    html, body {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: #111827;
+      color: white;
+      touch-action: manipulation;
+      user-select: none;
+    }
+
+    #gameWrap {
+      position: fixed;
+      inset: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background: linear-gradient(#38bdf8, #bae6fd 58%, #86efac 59%, #22c55e);
+    }
+
+    canvas {
+      width: 100vw;
+      height: 100vh;
+      display: block;
+    }
+
+    .screen {
+      position: fixed;
+      inset: 0;
+      z-index: 5;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 22px;
+      background: rgba(15, 23, 42, 0.72);
+      backdrop-filter: blur(5px);
+      text-align: center;
+    }
+
+    .hidden { display: none; }
+
+    h1 {
+      margin: 0 0 10px;
+      font-size: clamp(32px, 9vw, 56px);
+      line-height: 1;
+      text-shadow: 0 4px 0 rgba(0,0,0,0.25);
+    }
+
+    p {
+      max-width: 460px;
+      margin: 8px 0 18px;
+      font-size: 16px;
+      color: #e5e7eb;
+    }
+
+    .characters {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(130px, 1fr));
+      gap: 14px;
+      width: min(420px, 100%);
+      margin: 12px 0 18px;
+    }
+
+    .card {
+      border: 2px solid rgba(255,255,255,0.2);
+      border-radius: 22px;
+      padding: 16px 10px 14px;
+      background: rgba(255,255,255,0.13);
+      color: white;
+      cursor: pointer;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.25);
+      transition: transform .12s ease, border-color .12s ease, background .12s ease;
+    }
+
+    .card:active { transform: scale(0.96); }
+    .card.selected {
+      border-color: #facc15;
+      background: rgba(250, 204, 21, 0.22);
+    }
+
+    .avatar {
+      width: 82px;
+      height: 82px;
+      margin: 0 auto 10px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.18);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      border: 3px solid rgba(255,255,255,0.55);
+    }
+
+    .avatar img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .name {
+      font-size: 24px;
+      font-weight: 800;
+      letter-spacing: .3px;
+    }
+
+    button.primary {
+      width: min(340px, 90vw);
+      border: 0;
+      border-radius: 999px;
+      padding: 15px 22px;
+      font-size: 19px;
+      font-weight: 800;
+      color: #111827;
+      background: #facc15;
+      box-shadow: 0 8px 0 #ca8a04, 0 18px 32px rgba(0,0,0,0.25);
+      cursor: pointer;
+    }
+
+    button.primary:active {
+      transform: translateY(4px);
+      box-shadow: 0 4px 0 #ca8a04, 0 12px 26px rgba(0,0,0,0.25);
+    }
+
+    #hud {
+      position: fixed;
+      top: env(safe-area-inset-top, 0);
+      left: 0;
+      right: 0;
+      z-index: 2;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 14px 16px;
+      pointer-events: none;
+      font-weight: 900;
+      text-shadow: 0 2px 0 rgba(0,0,0,0.35);
+    }
+
+    #score { font-size: 34px; }
+    #chosen { font-size: 16px; opacity: .92; }
+
+    .small {
+      font-size: 13px;
+      color: #cbd5e1;
+      margin-top: 14px;
+    }
+  </style>
+</head>
+<body>
+  <div id="gameWrap">
+    <canvas id="game"></canvas>
+  </div>
+
+  <div id="hud" class="hidden">
+    <div id="score">0</div>
+    <div id="chosen">Joci</div>
+  </div>
+
+  <section id="menu" class="screen">
+    <h1>Flappy</h1>
+    <p>Válassz karaktert, majd koppints a képernyőre az ugráshoz. Kerüld ki a csöveket!</p>
+
+    <div class="characters">
+      <button class="card selected" data-name="Joci" data-img="joci.png" type="button">
+        <div class="avatar"><img src="joci.png" alt="Joci" onerror="this.style.display='none'; this.parentElement.textContent='J';"></div>
+        <div class="name">Joci</div>
+      </button>
+
+      <button class="card" data-name="Beni" data-img="beni.png" type="button">
+        <div class="avatar"><img src="beni.png" alt="Beni" onerror="this.style.display='none'; this.parentElement.textContent='B';"></div>
+        <div class="name">Beni</div>
+      </button>
+    </div>
+
+    <button id="startBtn" class="primary" type="button">Start</button>
+    <div class="small">Mobilon: koppintás. Gépen: Space / egérkattintás.</div>
+  </section>
+
+  <section id="gameOver" class="screen hidden">
+    <h1>Vége!</h1>
+    <p id="finalScore">Pontszám: 0</p>
+    <button id="restartBtn" class="primary" type="button">Újra</button>
+  </section>
+
+  <script>
+    const canvas = document.getElementById('game');
+    const ctx = canvas.getContext('2d');
+    const menu = document.getElementById('menu');
+    const gameOverScreen = document.getElementById('gameOver');
+    const startBtn = document.getElementById('startBtn');
+    const restartBtn = document.getElementById('restartBtn');
+    const scoreEl = document.getElementById('score');
+    const chosenEl = document.getElementById('chosen');
+    const finalScoreEl = document.getElementById('finalScore');
+    const hud = document.getElementById('hud');
+    const cards = document.querySelectorAll('.card');
+
+    let W = 0, H = 0, dpr = 1;
+    let state = 'menu';
+    let selected = { name: 'Joci', img: 'joci.png' };
+    let characterImage = new Image();
+    let bird, pipes, score, frame, speed, gap, pipeWidth;
+
+    function resize() {
+      dpr = Math.min(window.devicePixelRatio || 1, 2);
+      W = window.innerWidth;
+      H = window.innerHeight;
+      canvas.width = Math.floor(W * dpr);
+      canvas.height = Math.floor(H * dpr);
+      canvas.style.width = W + 'px';
+      canvas.style.height = H + 'px';
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    }
+
+    window.addEventListener('resize', resize);
+    resize();
+
+    cards.forEach(card => {
+      card.addEventListener('click', () => {
+        cards.forEach(c => c.classList.remove('selected'));
+        card.classList.add('selected');
+        selected = {
+          name: card.dataset.name,
+          img: card.dataset.img
+        };
+      });
+    });
+
+    function loadCharacter() {
+      characterImage = new Image();
+      characterImage.src = selected.img;
+      chosenEl.textContent = selected.name;
+    }
+
+    function resetGame() {
+      loadCharacter();
+      bird = {
+        x: W * 0.27,
+        y: H * 0.42,
+        r: Math.max(22, Math.min(W, H) * 0.045),
+        vy: 0,
+        rotation: 0
+      };
+      pipes = [];
+      score = 0;
+      frame = 0;
+      speed = Math.max(2.5, W * 0.006);
+      gap = Math.max(145, H * 0.25);
+      pipeWidth = Math.max(58, W * 0.15);
+      scoreEl.textContent = score;
+    }
+
+    function startGame() {
+      state = 'playing';
+      menu.classList.add('hidden');
+      gameOverScreen.classList.add('hidden');
+      hud.classList.remove('hidden');
+      resetGame();
+    }
+
+    function endGame() {
+      state = 'over';
+      hud.classList.add('hidden');
+      finalScoreEl.textContent = `Pontszám: ${score}`;
+      gameOverScreen.classList.remove('hidden');
+    }
+
+    function flap() {
+      if (state === 'playing') {
+        bird.vy = -Math.max(7.5, H * 0.014);
+      }
+    }
+
+    startBtn.addEventListener('click', startGame);
+    restartBtn.addEventListener('click', startGame);
+
+    window.addEventListener('pointerdown', e => {
+      if (e.target.closest('button')) return;
+      flap();
+    });
+
+    window.addEventListener('keydown', e => {
+      if (e.code === 'Space') {
+        e.preventDefault();
+        if (state === 'playing') flap();
+      }
+    });
+
+    function addPipe() {
+      const marginTop = H * 0.12;
+      const marginBottom = H * 0.18;
+      const minY = marginTop;
+      const maxY = H - marginBottom - gap;
+      const topH = Math.random() * Math.max(40, maxY - minY) + minY;
+      pipes.push({
+        x: W + pipeWidth,
+        topH,
+        bottomY: topH + gap,
+        passed: false
+      });
+    }
+
+    function rectCircleCollide(rx, ry, rw, rh, cx, cy, cr) {
+      const closestX = Math.max(rx, Math.min(cx, rx + rw));
+      const closestY = Math.max(ry, Math.min(cy, ry + rh));
+      const dx = cx - closestX;
+      const dy = cy - closestY;
+      return dx * dx + dy * dy < cr * cr;
+    }
+
+    function drawBackground() {
+      const sky = ctx.createLinearGradient(0, 0, 0, H);
+      sky.addColorStop(0, '#38bdf8');
+      sky.addColorStop(0.58, '#bae6fd');
+      sky.addColorStop(0.59, '#86efac');
+      sky.addColorStop(1, '#22c55e');
+      ctx.fillStyle = sky;
+      ctx.fillRect(0, 0, W, H);
+
+      ctx.fillStyle = 'rgba(255,255,255,.75)';
+      for (let i = 0; i < 4; i++) {
+        const x = (W - ((frame * 0.35) % (W + 180)) + i * 190) % (W + 180) - 90;
+        const y = 70 + i * 38;
+        ctx.beginPath();
+        ctx.arc(x, y, 24, 0, Math.PI * 2);
+        ctx.arc(x + 28, y - 10, 30, 0, Math.PI * 2);
+        ctx.arc(x + 62, y, 24, 0, Math.PI * 2);
+        ctx.fill();
+      }
+    }
+
+    function drawPipe(pipe) {
+      ctx.fillStyle = '#16a34a';
+      ctx.strokeStyle = '#166534';
+      ctx.lineWidth = 4;
+
+      ctx.fillRect(pipe.x, 0, pipeWidth, pipe.topH);
+      ctx.strokeRect(pipe.x, 0, pipeWidth, pipe.topH);
+      ctx.fillRect(pipe.x - 6, pipe.topH - 24, pipeWidth + 12, 24);
+      ctx.strokeRect(pipe.x - 6, pipe.topH - 24, pipeWidth + 12, 24);
+
+      const bottomH = H - pipe.bottomY;
+      ctx.fillRect(pipe.x, pipe.bottomY, pipeWidth, bottomH);
+      ctx.strokeRect(pipe.x, pipe.bottomY, pipeWidth, bottomH);
+      ctx.fillRect(pipe.x - 6, pipe.bottomY, pipeWidth + 12, 24);
+      ctx.strokeRect(pipe.x - 6, pipe.bottomY, pipeWidth + 12, 24);
+    }
+
+    function drawBird() {
+      ctx.save();
+      ctx.translate(bird.x, bird.y);
+      ctx.rotate(bird.rotation);
+
+      ctx.beginPath();
+      ctx.arc(0, 0, bird.r + 4, 0, Math.PI * 2);
+      ctx.fillStyle = 'rgba(0,0,0,.16)';
+      ctx.fill();
+
+      if (characterImage.complete && characterImage.naturalWidth > 0) {
+        ctx.save();
+        ctx.beginPath();
+        ctx.arc(0, 0, bird.r, 0, Math.PI * 2);
+        ctx.clip();
+        ctx.drawImage(characterImage, -bird.r, -bird.r, bird.r * 2, bird.r * 2);
+        ctx.restore();
+      } else {
+        ctx.fillStyle = selected.name === 'Joci' ? '#f59e0b' : '#60a5fa';
+        ctx.beginPath();
+        ctx.arc(0, 0, bird.r, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.fillStyle = '#111827';
+        ctx.font = `900 ${bird.r}px system-ui`;
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(selected.name[0], 0, 1);
+      }
+
+      ctx.strokeStyle = 'white';
+      ctx.lineWidth = 3;
+      ctx.beginPath();
+      ctx.arc(0, 0, bird.r, 0, Math.PI * 2);
+      ctx.stroke();
+      ctx.restore();
+    }
+
+    function update() {
+      if (state !== 'playing') return;
+
+      frame++;
+      const gravity = Math.max(0.38, H * 0.00075);
+      bird.vy += gravity;
+      bird.y += bird.vy;
+      bird.rotation = Math.max(-0.55, Math.min(0.85, bird.vy * 0.065));
+
+      const spawnEvery = Math.max(78, Math.floor(125 - W * 0.035));
+      if (frame === 1 || frame % spawnEvery === 0) addPipe();
+
+      for (const pipe of pipes) {
+        pipe.x -= speed;
+
+        if (!pipe.passed && pipe.x + pipeWidth < bird.x) {
+          pipe.passed = true;
+          score++;
+          scoreEl.textContent = score;
+          if (score % 5 === 0) speed += 0.25;
+        }
+
+        const hitTop = rectCircleCollide(pipe.x, 0, pipeWidth, pipe.topH, bird.x, bird.y, bird.r * 0.82);
+        const hitBottom = rectCircleCollide(pipe.x, pipe.bottomY, pipeWidth, H - pipe.bottomY, bird.x, bird.y, bird.r * 0.82);
+        if (hitTop || hitBottom) endGame();
+      }
+
+      pipes = pipes.filter(pipe => pipe.x + pipeWidth > -20);
+
+      if (bird.y - bird.r < 0 || bird.y + bird.r > H) endGame();
+    }
+
+    function render() {
+      drawBackground();
+
+      if (state === 'playing' || state === 'over') {
+        pipes.forEach(drawPipe);
+        drawBird();
+      }
+
+      requestAnimationFrame(loop);
+    }
+
+    function loop() {
+      update();
+      render();
+    }
+
+    loop();
+  </script>
+</body>
+</html>
